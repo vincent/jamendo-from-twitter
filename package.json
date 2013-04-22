@@ -1,0 +1,33 @@
+{
+  "name": "jamendo-from-twitter",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Extract Jamendo related data from tweets",
+  "author": "Vincent Lark <vincent.lark@gmail.com>",
+  "license": "BSD",
+  "scripts": {
+    "start": "node harvester.js"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "twitter": "~0.1.18",
+    "optimist": "~0.4.0",
+    "elongate": "~0.2.1",
+    "async": "~0.2.7"
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "grunt": ">= 0.4.0",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-shell": "*",
+    "grunt-contrib-copy": "~0.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "twitter",
+    "jamendo"
+  ]
+}
