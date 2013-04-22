@@ -1,12 +1,12 @@
 # Install
-```
+```bash
 $ git clone git@github.com:vincent/jamendo-from-twitter.git
 $ cd jamendo-from-twitter
 $ npm install
 ```
 
 # Run in command line
-```
+```bash
 $ node harvester.js
 ```
 
@@ -22,7 +22,7 @@ You should get
 
 From 
 ```
-I'm listening to explain - attila jelinek on Jamendo http://t.co/tEQoxneNQu
+I'm listening to attila on Jamendo http://t.co/tEQoxneNQu
 ```
 You should get
 ```
@@ -31,7 +31,7 @@ You should get
 
 
 # Run in javascript
-```
+```javascript
 // import module
 var JamendoFromTwitter = require('jamendo-from-twitter')
 
@@ -57,11 +57,11 @@ harvester.write({ text: "is a fan of attila jelinek http://t.co/9fNJrR4pNI", exp
 ```
 
 # Run Tests
-```
+```bash
 $ node tests
 ```
 
 # Run Grunt (jslint, docs)
-```
+```bash
 $ grunt
 ```
