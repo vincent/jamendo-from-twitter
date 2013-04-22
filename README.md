@@ -42,13 +42,18 @@ var harvester = new JamendoFromTwitter({
 
 // listen to message events
 harvester.on('message', function(message){
-
 	// message.extracted contains jamendo data
-  console.log(message.extracted)
+	console.log(message.extracted)
 })
 
 // start harvesting
 harvester.start()
+
+// or write data directly
+harvester.write({ text: "I'm listening to explain - attila jelinek on Jamendo http://jamen.do/t/691953" })
+
+// also with short links, just set the expand_links attribute
+harvester.write({ text: "is a fan of attila jelinek http://t.co/9fNJrR4pNI", expand_links: true })
 ```
 
 # Run Tests
