@@ -10,6 +10,17 @@ $ npm install
 $ node harvester.js
 ```
 
+# Examples
+From 
+```
+I'm listening to explain - attila jelinek on Jamendo http://jamen.do/t/691953
+```
+
+You should get
+```
+{ track_ids: [ 691953 ] }
+```
+
 # Run in javascript
 ```
 // import module
