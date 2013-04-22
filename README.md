@@ -15,11 +15,20 @@ From
 ```
 I'm listening to explain - attila jelinek on Jamendo http://jamen.do/t/691953
 ```
-
 You should get
 ```
 { track_ids: [ 691953 ] }
 ```
+
+From 
+```
+I'm listening to explain - attila jelinek on Jamendo http://t.co/tEQoxneNQu
+```
+You should get
+```
+{ playlist_ids: [ 'a74097' ] }
+```
+
 
 # Run in javascript
 ```
@@ -33,11 +42,18 @@ var harvester = new JamendoFromTwitter({
 
 // listen to message events
 harvester.on('message', function(message){
+
+	// message.extracted contains jamendo data
   console.log(message.extracted)
 })
 
 // start harvesting
 harvester.start()
+```
+
+# Run Tests
+```
+$ node tests
 ```
 
 # Run Grunt (jslint, docs)

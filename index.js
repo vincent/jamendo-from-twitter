@@ -10,6 +10,8 @@ var JamendoFromTwitter = function(conf) {
   events.EventEmitter.call(this);
   var self = this;
 
+  this.processed_count = 0;
+
   // instanciate a twitter client
   this.twit = new Twitter(conf.twitter);
 
@@ -22,7 +24,20 @@ util.inherits(JamendoFromTwitter, events.EventEmitter);
 JamendoFromTwitter.prototype.write = function(data){
 	var self = this;
 
-	data.fulltext = '';
+	// if we have to expand links
+	// call me (maybe) later
+	if (data.expand_links) {
+		JamendoFromTwitter.expandLinks(data.text, function(links){
+			data.entities = {
+				urls: links
+			};
+			data.expand_links = false;
+			self.write(data);
+		});
+		return;
+	}
+
+	data.fulltext = data.text;
 
 	// append all orginal links to fulltext
 	if (data.entities) {
@@ -35,8 +50,8 @@ JamendoFromTwitter.prototype.write = function(data){
 
 	// extract jamendo related data
 	JamendoFromTwitter.extractData(data.fulltext, function(extracted){
-		if (!extracted) {
-			//console.log('no jamendo data in', data.text);
+		if (extracted.nothing) {
+			console.log('no jamendo data in', data.fulltext);
 			return;
 		}
 
@@ -44,12 +59,15 @@ JamendoFromTwitter.prototype.write = function(data){
 			// internal usage
 			should		: data.should,
 			extracted	: extracted,
+			text			: data.text,
+			fulltext	: data.fulltext,
 
 			// osef
 			id_str		: data.id_str,
-			text			: data.text,
 			user			: data.user
 		};
+
+		self.processed_count++;
 
 		self.emit('message', data);
 	});
@@ -69,27 +87,19 @@ JamendoFromTwitter.prototype.start = function(streamOptions) {
       });
 
       self.twit.search(streamOptions.track, function(res){
-        console.log("I'll also searched with filters", util.inspect(streamOptions.track));
-				console.log('search yield ' + res.results.length + ' results');
+        console.log("I'll also search with filters", util.inspect(streamOptions.track), ': ' + res.results.length + ' results');
 
 				// search results do not have expanded_links
 				// so we have to expand urls
 				async.forEach(res.results,
 					function(data_, cb){
-
-						// extract links
-						JamendoFromTwitter.expandLinks(data_.text, function(links){
-							data_.entities = {
-								urls: links
-							};
-
-							// eat this
-							self.write(data_);
-							cb(null);
-						});
+						// eat this
+						data_.expand_links = true;
+						self.write(data_);
+						cb(null);
 					},
 					function(err){
-						console.log('search done');
+						//console.log('search done');
 					});
 			});
 
@@ -125,14 +135,12 @@ JamendoFromTwitter.extractData = function(text, callback) {
 
 	// find resource links
 	var match = [],
-			result = false,
+			result = { nothing: true },
 			complex = null,
-			reg = new RegExp("jamen.*do(.com|)/(en|es|fr|de)/([^ ]+)", "gi");
+			reg = new RegExp("jamen.*do(.com|)/(en/|es/|fr/|de/|)([^ ]+)", "gi");
 
 	// iterate over suposed jamendo ressources urls 
 	while ((match = reg.exec(text)) !== null) {
-		if (!result) { result = {}; }
-
 		/*
 		match[0] = matched
 		match[1] = tld
@@ -146,16 +154,19 @@ JamendoFromTwitter.extractData = function(text, callback) {
 		if (complex[0] === 't' || complex[0] === 'track') {
 			if (!result.track_ids) { result.track_ids = []; }
 			result.track_ids.push(complex[1]);
+			result.nothing = false;
 
 		// it's an artist
 		} else if (complex[0] === 'l' || complex[0] === 'album' || complex[0] === 'list') {
 			if (!result.playlist_ids) { result.playlist_ids = []; }
 			result.playlist_ids.push(complex[1]);
+			result.nothing = false;
 
 		// it's an artist !
 		} else if (complex[0] === 'a' || complex[0] === 'artist') {
 			if (!result.artist_ids) { result.artist_ids = []; }
 			result.artist_ids.push(complex[1]);
+			result.nothing = false;
 
 		} else {
 			// not matched

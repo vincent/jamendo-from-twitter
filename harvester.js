@@ -52,38 +52,9 @@ for (var i=0; i < filters.length; i++) {
 // get an harvester
 var harvester = new JamendoFromTwitter(conf);
 
-
-
-// tests
+// listener
 harvester.on('message', function(message){
-  if (message.should) {
-    console.log(message.should + ': ', message.extracted);
-  } else {
-    console.log(message.extracted);
-  }
-});
-
-harvester.write({
-  should: 'Should find a track id',
-  text: "I'm listening to explain - attila jelinek on Jamendo http://jamen.do/t/691953"
-});
-harvester.write({
-  should: 'Should find a track id',
-  text: "@Jamendo users, check out the latest single by Kassy Key & the Raindoggs: http://jamen.do/t/1027911"
-});
-
-harvester.write({
-  should: 'Should find an artist id',
-  text: "is a fan of attila jelinek http://jamen.do/a/359962"
-});
-harvester.write({
-  should: 'Should find a track id',
-  text: "I'm listening to explain - attila jelinek on Jamendo http://t.co/TIWpHWb5LF",
-  entities: {
-    urls: [
-      { expanded_url: 'http://jamen.do/t/691953' }
-    ]
-  }
+  console.log(message.extracted);
 });
 
 // start harvesting
