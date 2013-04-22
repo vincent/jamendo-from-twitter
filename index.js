@@ -3,7 +3,7 @@ var events = require('events');
 var async = require('async');
 var util = require('util');
 
-var elongate = require('elongate')
+var elongate = require('elongate');
 var Twitter = require('twitter');
 
 var JamendoFromTwitter = function(conf) {
@@ -27,8 +27,9 @@ JamendoFromTwitter.prototype.write = function(data){
 	// append all orginal links to fulltext
 	if (data.entities) {
 		for (var i = 0; i < data.entities.urls.length; i++) {
-			if (data.entities.urls[i] && data.entities.urls[i].expanded_url)
+			if (data.entities.urls[i] && data.entities.urls[i].expanded_url) {
 				data.fulltext += ' ' + data.entities.urls[i].expanded_url;
+			}
 		}
 	}
 
@@ -130,7 +131,7 @@ JamendoFromTwitter.extractData = function(text, callback) {
 
 	// iterate over suposed jamendo ressources urls 
 	while ((match = reg.exec(text)) !== null) {
-		if (!result) result = {};
+		if (!result) { result = {}; }
 
 		/*
 		match[0] = matched
@@ -142,18 +143,18 @@ JamendoFromTwitter.extractData = function(text, callback) {
 		complex = match[3].split('/');
 
 		// it's a trap^Wtrack !
-		if (complex[0] == 't' || complex[0] == 'track') {
-			if (!result.track_ids) result.track_ids = [];
+		if (complex[0] === 't' || complex[0] === 'track') {
+			if (!result.track_ids) { result.track_ids = []; }
 			result.track_ids.push(complex[1]);
 
 		// it's an artist
-		} else if (complex[0] == 'l' || complex[0] == 'album' || complex[0] == 'list') {
-			if (!result.playlist_ids) result.playlist_ids = [];
+		} else if (complex[0] === 'l' || complex[0] === 'album' || complex[0] === 'list') {
+			if (!result.playlist_ids) { result.playlist_ids = []; }
 			result.playlist_ids.push(complex[1]);
 
 		// it's an artist !
-		} else if (complex[0] == 'a' || complex[0] == 'artist') {
-			if (!result.artist_ids) result.artist_ids = [];
+		} else if (complex[0] === 'a' || complex[0] === 'artist') {
+			if (!result.artist_ids) { result.artist_ids = []; }
 			result.artist_ids.push(complex[1]);
 
 		} else {

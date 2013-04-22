@@ -33,11 +33,6 @@ if (argv.help) {
   process.exit();
 }
 
-if (argv.langs) {
-  console.log(tsharv.knownLanguages.join("\n"));
-  process.exit();
-}
-
 if (argv.countries) {
   console.log(locations.countries);
   process.exit();
