@@ -1,6 +1,7 @@
 # Install
 ```
 $ git clone git@github.com:vincent/jamendo-from-twitter.git
+$ cd jamendo-from-twitter
 $ npm install
 ```
 
