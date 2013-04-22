@@ -16,8 +16,8 @@ From
 I'm listening to explain - attila jelinek on Jamendo http://jamen.do/t/691953
 ```
 You should get
-```
-{ track_ids: [ 691953 ] }
+```json
+{ "track_ids": [ "691953" ] }
 ```
 
 From 
@@ -25,8 +25,8 @@ From
 I'm listening to attila on Jamendo http://t.co/tEQoxneNQu
 ```
 You should get
-```
-{ playlist_ids: [ 'a74097' ] }
+```json
+{ "playlist_ids": [ "a74097" ] }
 ```
 
 
