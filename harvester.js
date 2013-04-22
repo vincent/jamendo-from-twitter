@@ -60,7 +60,7 @@ harvester.on('message', function(message){
     console.log(message.should + ': ', message.extracted);
   } else {
     console.log(message.extracted);
-}
+  }
 });
 
 harvester.write({
