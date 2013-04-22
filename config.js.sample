@@ -1,10 +1,4 @@
 module.exports = {
-  webapp: {
-    port:         3000,
-    ip:           '0.0.0.0',
-    secret:       'ploplop',
-    wait:         8000
-  },
   twitter: {
     consumer_key:         'consumer_key',
     consumer_secret:      'consumer_secret',
