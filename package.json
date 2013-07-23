@@ -10,7 +10,7 @@
   },
   "main": "index.js",
   "dependencies": {
-    "twitter": "git://github.com/desmondmorris/node-twitter.git#master",
+    "twitter": "~0.2.1",
     "optimist": "~0.4.0",
     "elongate": "~0.2.1",
     "async": "~0.2.7"
