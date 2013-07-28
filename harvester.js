@@ -16,7 +16,7 @@ try {
 
 
 // quick & dirty modules
-var locations = require('locations');
+var locations = require('./lib/locations');
 
 // our scraping app
 var JamendoFromTwitter = require('./index.js');
