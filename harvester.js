@@ -53,10 +53,27 @@ for (var i=0; i < filters.length; i++) {
 var harvester = new JamendoFromTwitter(conf);
 
 // listener
-harvester.on('message', function(message){
-  console.log(message.extracted);
+harvester.on('message', function(message) {
+    
+  console.log('harvester on message');
+    
+  console.log(message);
+  
 });
 
-// start harvesting
-harvester.start(streamOptions);
+harvester.on('error', function(error) {
+
+    console.log('harvester on error');
+
+    console.log(error.message);
+    
+});
+
+var searchOptions = streamOptions;
+
+// do a search
+harvester.executeSearch(searchOptions);
+
+// start the harvester
+harvester.startStream(streamOptions);
 
