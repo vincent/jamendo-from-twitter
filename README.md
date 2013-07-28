@@ -1,13 +1,13 @@
 # Install
 
-## From npm
+### From npm
 ```bash
 $ npm install jamendo-from-twitter
 ```
 
-## From Github
+### From Github
 ```bash
-$ git clone git@github.com:vincent/jamendo-from-twitter.git
+$ git clone https://github.com/vincent/jamendo-from-twitter.git
 $ cd jamendo-from-twitter
 $ npm install
 ```
