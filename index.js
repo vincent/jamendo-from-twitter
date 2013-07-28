@@ -21,7 +21,7 @@ var JamendoFromTwitter = function(conf) {
     this.processed_count = 0;
 
     // instanciate a twitter client
-    this.twit = new Twitter(conf);
+    this.twit = new Twitter(conf.twitter);
 
   } else {
 
@@ -40,10 +40,6 @@ util.inherits(JamendoFromTwitter, events.EventEmitter);
  * @returns {unresolved}
  */
 JamendoFromTwitter.prototype.write = function(data) {
-
-  console.log('data');
-  console.log(data);
-  console.log('data');
 
   var self = this;
 
