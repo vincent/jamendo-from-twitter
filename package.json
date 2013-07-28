@@ -1,7 +1,6 @@
 {
   "name": "jamendo-from-twitter",
   "version": "0.0.1",
-  "private": true,
   "description": "Extract Jamendo related data from tweets",
   "author": "Vincent Lark <vincent.lark@gmail.com>",
   "license": "BSD",
@@ -12,7 +11,7 @@
   "bin" : {
     "jamendo-from-twitter" : "./harvester.js"
   },
-  "dependencies": {"  "dependencies": {
+  "dependencies": {
     "twitter": "~0.2.1",
     "optimist": "~0.4.0",
     "elongate": "~0.2.1",
