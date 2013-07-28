@@ -1,7 +1,7 @@
 
 var events = require('events');
-var async = require('async');
-var util = require('util');
+var async  = require('async');
+var util   = require('util');
 
 var elongate = require('elongate');
 var Twitter = require('twitter');
@@ -13,7 +13,12 @@ var Twitter = require('twitter');
  */
 var JamendoFromTwitter = function(conf) {
 
-  if (typeof conf !== 'undefined') {
+  if (typeof conf === 'undefined' || !conf.twitter || !conf.twitter.access_token_key) {
+
+    console.log('Error: missing confirguration');
+    process.exit(1);
+
+  } else {
 
     events.EventEmitter.call(this);
     var self = this;
@@ -22,10 +27,6 @@ var JamendoFromTwitter = function(conf) {
 
     // instanciate a twitter client
     this.twit = new Twitter(conf.twitter);
-
-  } else {
-
-    console.log('Error: missing confirguration');
 
   }
 

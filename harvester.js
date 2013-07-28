@@ -1,12 +1,20 @@
 #!/usr/bin/env node
 
 // modules dependencies
-var conf      = require('./config'),
-    fs        = require('fs'),
+var fs        = require('fs'),
     sys       = require('sys'),
     util      = require('util'),
     optimist  = require('optimist');
-  
+
+// optional config
+var conf = { twitter: { } };
+try {
+  conf       = require('./config');
+} catch (err) {
+  // no config, must be given as arguments
+}
+
+
 // quick & dirty modules
 var locations = require('locations');
 
