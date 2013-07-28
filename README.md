@@ -1,3 +1,8 @@
+# A tool for extracting Jamendo related data from Twitter
+
+[![Dependencies](https://david-dm.org/vincent/jamendo-from-twitter.png)](https://david-dm.org/vincent/jamendo-from-twitter)
+[![NPM version](https://badge.fury.io/js/jamendo-from-twitter.png)](http://badge.fury.io/js/jamendo-from-twitter)
+
 # Install
 
 ### From npm
