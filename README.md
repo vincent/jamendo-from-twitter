@@ -1,4 +1,11 @@
 # Install
+
+## From npm
+```bash
+$ npm install jamendo-from-twitter
+```
+
+## From Github
 ```bash
 $ git clone git@github.com:vincent/jamendo-from-twitter.git
 $ cd jamendo-from-twitter
@@ -7,7 +14,8 @@ $ npm install
 
 # Run in command line
 ```bash
-$ node harvester.js
+$ ./harvester.js --help
+$ jamendo-from-twitter --help  # if installed globally
 ```
 
 # Examples
