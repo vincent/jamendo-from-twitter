@@ -15,7 +15,7 @@ var JamendoFromTwitter = function(conf) {
 
   if (typeof conf === 'undefined' || !conf.twitter || !conf.twitter.access_token_key) {
 
-    console.log('Error: missing confirguration');
+    console.log('Error: missing configuration');
     process.exit(1);
 
   } else {
@@ -35,12 +35,169 @@ util.inherits(JamendoFromTwitter, events.EventEmitter);
 
 /**
  * 
+ * @param {type} streamOptions
+ * @returns {undefined}
+ */
+JamendoFromTwitter.prototype.startStream = function(streamOptions) {
+  var self = this;
+
+  var self = this;
+
+  streamOptions = streamOptions || {};
+  //streamOptions.track = 'jamendo' ; //,listen to,is a fan of';
+
+  this.twit.verifyCredentials(function(data) {
+
+    if (streamOptions.track || streamOptions.follow || streamOptions.locations) {
+
+      self.twit.stream('statuses/filter', streamOptions, function(stream) {
+
+        console.log("I'll listen with filters", util.inspect(streamOptions));
+
+        stream.on('data', function(data) {
+            
+            self.write(data, function(error, message) {
+                
+                if (!error) {
+                
+                    self.emit('message', message);
+                    
+                } else {
+                    
+                    self.emit('error', error);
+                    
+                }
+
+            });
+            
+        });
+
+      });
+
+    } else {
+
+      self.twit.stream('statuses/sample', function(stream) {
+
+        console.log("I'm listenning to twitter samples, use parameters to customize");
+
+        stream.on('data', function(data) {
+            
+            self.write(data, function(error, message) {
+                
+                if (!error) {
+                
+                    self.emit('message', message);
+                    
+                } else {
+                    
+                    self.emit('error', error);
+                    
+                }
+
+            });
+            
+        });
+
+      });
+
+    }
+  });
+};
+
+JamendoFromTwitter.prototype.executeSearch = function(searchOptions) {
+
+    var self = this;
+
+    self.twit.search(searchOptions.track, function(res) {
+
+      if (typeof res !== 'undefined' && res.search_metadata !== 'undefined') {
+
+        if (typeof res.statuses !== 'undefined') {
+
+          console.log("I'll also search with filters", util.inspect(searchOptions.track), ': ' + res.statuses.length + ' results');
+
+          // search results do not have expanded_links
+          // so we have to expand urls
+          async.forEach(res.statuses,
+            function(data_, cb) {
+              // eat this
+              data_.expand_links = true;
+              
+              self.write(data_, function(error, message) {
+
+                  if (!error) {
+
+                      self.emit('message', message);
+
+                  } else {
+
+                      self.emit('error', error);
+
+                  }
+
+              });
+                
+              cb(null);
+
+            },
+            function(err) {
+              //console.log('Error: search failed');
+              self.emit('error', { message: 'Error: search failed' });
+            }
+          );
+
+        } else {
+
+          //console.log('Error: no results');
+          self.emit('error', { message: 'Error: no results' });
+
+        }
+
+      } else {
+
+        if (typeof res.statusCode !== 'undefined') {
+
+          //console.log('Error: ' + res.statusCode);
+          self.emit('error', { message: 'Error: ' + res.statusCode });
+
+        }
+
+        if (typeof res.data !== 'undefined') {
+
+          var dataObject = JSON.parse(res.data);
+
+          var messagesLength = dataObject.errors.length;
+
+          for (var i = 0; i < messagesLength; i++) {
+
+            //console.log('Error: ' + dataObject.errors[i].message);
+            self.emit('error', { message: 'Error: ' + dataObject.errors[i].message });
+
+          }
+
+        }
+
+        if (typeof res.statusCode === '404') {
+
+          //console.log('Error not found. For a possible solution check out: https://gist.github.com/chrisweb/5939997');
+          self.emit('error', { message: 'Error not found. For a possible solution check out: https://gist.github.com/chrisweb/5939997' });
+
+        }
+
+      }
+
+    });
+
+}
+
+/**
+ * 
  * where we pipe twitter stream data to our own emmitter
  * 
  * @param {type} data
  * @returns {unresolved}
  */
-JamendoFromTwitter.prototype.write = function(data) {
+JamendoFromTwitter.prototype.write = function(data, callback) {
 
   var self = this;
 
@@ -52,7 +209,7 @@ JamendoFromTwitter.prototype.write = function(data) {
         urls: links
       };
       data.expand_links = false;
-      self.write(data);
+      self.write(data, callback);
     });
     return;
   }
@@ -71,8 +228,7 @@ JamendoFromTwitter.prototype.write = function(data) {
   // extract jamendo related data
   JamendoFromTwitter.extractData(data.fulltext, function(extracted) {
     if (extracted.nothing) {
-      console.log('no jamendo data in', data.fulltext);
-      return;
+      callback({ message: 'no jamendo data in' }, null);
     }
 
     data = {
@@ -83,113 +239,17 @@ JamendoFromTwitter.prototype.write = function(data) {
       fulltext: data.fulltext,
       // osef
       id_str: data.id_str,
-      user: data.user
+      user: data.user,
+      // raw
+      raw: data
     };
 
     self.processed_count++;
 
-    self.emit('message', data);
+    callback(false, data);
+    
   });
-};
-
-/**
- * 
- * @param {type} streamOptions
- * @returns {undefined}
- */
-JamendoFromTwitter.prototype.start = function(streamOptions) {
-  var self = this;
-  streamOptions = streamOptions || {};
-  //streamOptions.track = 'jamendo' ; //,listen to,is a fan of';
-
-  this.twit.verifyCredentials(function(data) {
-
-    if (streamOptions.track || streamOptions.follow || streamOptions.locations) {
-
-      self.twit.stream('statuses/filter', streamOptions, function(stream) {
-
-        console.log("I'll listen with filters", util.inspect(streamOptions));
-
-        stream.on('data', self.write);
-
-      });
-
-      self.twit.search(streamOptions.track, function(res) {
-
-        console.log(res);
-        //console.log(res.statusCode);
-
-        if (typeof res !== 'undefined' && res.search_metadata !== 'undefined') {
-
-          if (typeof res.statuses !== 'undefined') {
-
-            console.log("I'll also search with filters", util.inspect(streamOptions.track), ': ' + res.statuses.length + ' results');
-
-            // search results do not have expanded_links
-            // so we have to expand urls
-            async.forEach(res.statuses,
-                    function(data_, cb) {
-                      // eat this
-                      data_.expand_links = true;
-                      self.write(data_);
-                      cb(null);
-
-                    },
-                    function(err) {
-                      console.log('Error: search failed');
-                    }
-            );
-
-          } else {
-
-            console.log('Error: no results');
-
-          }
-
-        } else {
-
-          if (typeof res.statusCode !== 'undefined') {
-
-            console.log('Error: ' + res.statusCode);
-
-          }
-
-          if (typeof res.data !== 'undefined') {
-
-            var dataObject = JSON.parse(res.data);
-
-            var messagesLength = dataObject.errors.length;
-
-            for (var i = 0; i < messagesLength; i++) {
-
-              console.log(dataObject.errors[i].message);
-
-            }
-
-          }
-
-          if (typeof res.statusCode === '404') {
-
-            console.log('Error not found. For a possible solution check out: https://gist.github.com/chrisweb/5939997');
-
-          }
-
-        }
-
-      });
-
-    } else {
-
-      self.twit.stream('statuses/sample', function(stream) {
-
-        stream.on('data', self.write);
-
-        console.log("I'm listenning to twitter samples, use parameters to customize");
-
-      });
-
-    }
-  });
+  
 };
 
 /**
