@@ -1,6 +1,6 @@
 {
   "name": "jamendo-from-twitter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Extract Jamendo related data from tweets",
   "author": "Vincent Lark <vincent.lark@gmail.com>",
   "license": "BSD",
