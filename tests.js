@@ -46,13 +46,19 @@ var tests = [
   { expand_links: true,
     should: 'Should find a track id',
     text: "is a fan of attila jelinek http://t.co/9fNJrR4pNI"
-  },
+  }
 
 ];
 
 // parse test data
 for (var i = 0; i < tests.length; i++) {
-  harvester.write(tests[i]);
+  harvester.write(tests[i], function(error, data) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(data);
+    }
+  });
 }
 
 // let the stream complete

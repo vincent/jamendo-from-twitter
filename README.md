@@ -56,12 +56,12 @@ var harvester = new JamendoFromTwitter({
 // listen to message events
 harvester.on('message', function(message){
 	// message.extracted contains jamendo data
-	console.log(message.extracted)
+	console.log(message.extracted);
 })
 
 harvester.on('error', function(error){
 	// error object with message property
-	console.log(error.message)
+	console.log(error.message);
 })
 
 // start harvesting
@@ -73,18 +73,18 @@ harvester.executeSearch()
 // or write data directly
 harvester.write({ text: "I'm listening to attila on Jamendo http://jamen.do/t/691953" }, function(error, data) {
 	if (error) {
-		console.log(error)
+		console.log(error);
 	} else {
-		console.log(data)
+		console.log(data);
 	}
 })
 
 // also with short links, just set the expand_links attribute
 harvester.write({ text: "is a fan of attila jelinek http://t.co/9fNJrR4pNI", expand_links: true }, function(error, data) {
 	if (error) {
-		console.log(error)
+		console.log(error);
 	} else {
-		console.log(data)
+		console.log(data);
 	}
 })
 

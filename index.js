@@ -227,6 +227,7 @@ JamendoFromTwitter.prototype.write = function(data, callback) {
 
   // extract jamendo related data
   JamendoFromTwitter.extractData(data.fulltext, function(extracted) {
+    
     if (extracted.nothing) {
       callback({ message: 'no jamendo data in' }, null);
     }
