@@ -12,17 +12,17 @@
     "jamendo-from-twitter" : "./harvester.js"
   },
   "dependencies": {
-    "twitter": "~0.2.1",
-    "optimist": "~0.4.0",
+    "twitter": "~1.0.1",
+    "optimist": "~0.6.1",
     "elongate": "~0.2.1",
-    "async": "~0.2.7"
+    "async": "~0.9.0"
   },
   "devDependencies": {
     "coffee-script": "*",
-    "grunt": ">= 0.4.0",
-    "grunt-contrib-jshint": "~0.4.3",
-    "grunt-shell": "*",
-    "grunt-contrib-copy": "~0.4.0"
+    "grunt": ">= 0.4.5",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-shell": "1.1.1",
+    "grunt-contrib-copy": "~0.7.0"
   },
   "repository": {
     "type": "git",
