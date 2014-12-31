@@ -31,6 +31,7 @@ var JamendoFromTwitter = function(conf) {
   }
 
 };
+
 util.inherits(JamendoFromTwitter, events.EventEmitter);
 
 /**
@@ -39,20 +40,20 @@ util.inherits(JamendoFromTwitter, events.EventEmitter);
  * @returns {undefined}
  */
 JamendoFromTwitter.prototype.startStream = function(streamOptions) {
+  
   var self = this;
 
   var self = this;
 
   streamOptions = streamOptions || {};
-  //streamOptions.track = 'jamendo' ; //,listen to,is a fan of';
 
-  this.twit.verifyCredentials(function(data) {
-
+  this.twit.get('/account/verify_credentials', function(error, payload) {
+    
     if (streamOptions.track || streamOptions.follow || streamOptions.locations) {
 
       self.twit.stream('statuses/filter', streamOptions, function(stream) {
 
-        console.log("I'll listen with filters", util.inspect(streamOptions));
+        console.log('I\'ll listen with filters', util.inspect(streamOptions));
 
         stream.on('data', function(data) {
             
@@ -78,7 +79,7 @@ JamendoFromTwitter.prototype.startStream = function(streamOptions) {
 
       self.twit.stream('statuses/sample', function(stream) {
 
-        console.log("I'm listenning to twitter samples, use parameters to customize");
+        console.log('I\'m listenning to twitter samples, use parameters to customize');
 
         stream.on('data', function(data) {
             
@@ -107,23 +108,23 @@ JamendoFromTwitter.prototype.startStream = function(streamOptions) {
 JamendoFromTwitter.prototype.executeSearch = function(searchOptions) {
 
     var self = this;
+    
+    self.twit.get('/search/tweets', searchOptions.track, function(error, payload) {
+      
+      if (!error) {
 
-    self.twit.search(searchOptions.track, function(res) {
+        if (typeof payload !== null) {
 
-      if (typeof res !== 'undefined' && res.search_metadata !== 'undefined') {
-
-        if (typeof res.statuses !== 'undefined') {
-
-          console.log("I'll also search with filters", util.inspect(searchOptions.track), ': ' + res.statuses.length + ' results');
+          console.log('I\'ll also search with filters', util.inspect(searchOptions.track), ': ' + payload.statuses.length + ' results');
 
           // search results do not have expanded_links
           // so we have to expand urls
-          async.forEach(res.statuses,
-            function(data_, cb) {
+          async.forEach(payload.statuses,
+            function(data, callback) {
               // eat this
-              data_.expand_links = true;
+              data.expand_links = true;
               
-              self.write(data_, function(error, message) {
+              self.write(data, function(error, message) {
 
                   if (!error) {
 
@@ -137,64 +138,36 @@ JamendoFromTwitter.prototype.executeSearch = function(searchOptions) {
 
               });
                 
-              cb(null);
+              callback(null);
 
             },
-            function(err) {
-              //console.log('Error: search failed');
-              self.emit('error', { message: 'Error: search failed' });
+            function(error) {
+              self.emit('error', { message: 'Error: search failed', original_error: error });
             }
           );
 
         } else {
 
-          //console.log('Error: no results');
           self.emit('error', { message: 'Error: no results' });
 
         }
 
       } else {
 
-        if (typeof res.statusCode !== 'undefined') {
-
-          //console.log('Error: ' + res.statusCode);
-          self.emit('error', { message: 'Error: ' + res.statusCode });
-
-        }
-
-        if (typeof res.data !== 'undefined') {
-
-          var dataObject = JSON.parse(res.data);
-
-          var messagesLength = dataObject.errors.length;
-
-          for (var i = 0; i < messagesLength; i++) {
-
-            //console.log('Error: ' + dataObject.errors[i].message);
-            self.emit('error', { message: 'Error: ' + dataObject.errors[i].message });
-
-          }
-
-        }
-
-        if (typeof res.statusCode === '404') {
-
-          //console.log('Error not found. For a possible solution check out: https://gist.github.com/chrisweb/5939997');
-          self.emit('error', { message: 'Error not found. For a possible solution check out: https://gist.github.com/chrisweb/5939997' });
-
-        }
+        self.emit('error', { message: 'Error: search failed', original_error: error });
 
       }
 
     });
 
-}
+};
 
 /**
  * 
  * where we pipe twitter stream data to our own emmitter
  * 
  * @param {type} data
+ * @param {type} callback
  * @returns {unresolved}
  */
 JamendoFromTwitter.prototype.write = function(data, callback) {
@@ -264,14 +237,14 @@ JamendoFromTwitter.expandLinks = function(text, callback) {
   var urls = text.match(/http:\/\/[^ ]+/ig);
   if (urls && urls.length > 0) {
     async.map(urls,
-            function(url, next) {
-              elongate(url, function(err, expanded_url) {
-                next(null, {expanded_url: expanded_url});
-              });
-            },
-            function(err, results) {
-              callback(results ? results : []);
-            }
+      function(url, next) {
+        elongate(url, function(err, expanded_url) {
+          next(null, {expanded_url: expanded_url});
+        });
+      },
+      function(err, results) {
+        callback(results ? results : []);
+      }
     );
 
   } else {
@@ -288,21 +261,25 @@ JamendoFromTwitter.expandLinks = function(text, callback) {
 JamendoFromTwitter.extractData = function(text, callback) {
 
   // find resource links
-  var match = [],
-          result = {nothing: true},
-  complex = null,
-          reg = new RegExp("jamen.*do(.com|)/(en/|es/|fr/|de/|)([^ ]+)", "gi");
+  var match,
+    result = {nothing: true},
+    complex = null,
+    reg = new RegExp('(jamen.do|jamendo.com)/(en/|es/|fr/|de/|pl/|it/|)([^ ]+)', 'gi');
 
   // iterate over suposed jamendo ressources urls 
   while ((match = reg.exec(text)) !== null) {
-    /*
-     match[0] = matched
-     match[1] = tld
-     match[2] = lang
-     match[3] = path
-     */
+
+    //match[0] = matched
+    //match[1] = domain
+    //match[2] = lang
+    //match[3] = path
+    //match[4] = index
+    //match[5] = input
 
     complex = match[3].split('/');
+    
+    //console.log(match);
+    //console.log(complex);
 
     // it's a trap^Wtrack !
     if (complex[0] === 't' || complex[0] === 'track') {
@@ -335,6 +312,7 @@ JamendoFromTwitter.extractData = function(text, callback) {
   }
 
   callback(result);
+  
 };
 
 module.exports = JamendoFromTwitter;

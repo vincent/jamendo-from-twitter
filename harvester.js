@@ -9,11 +9,10 @@ var fs        = require('fs'),
 // optional config
 var conf = { twitter: { } };
 try {
-  conf       = require('./config');
+  conf = require('./config');
 } catch (err) {
-  // no config, must be given as arguments
+  throw('no config.js found, you must copy the copy.js.sample file, rename it to config.js and insert your own twitter API credentials');
 }
-
 
 // quick & dirty modules
 var locations = require('./lib/locations');
@@ -21,21 +20,20 @@ var locations = require('./lib/locations');
 // our scraping app
 var JamendoFromTwitter = require('./index.js');
 
-
 // launcher options
 var argv = optimist
-    .describe('locations',          'Specifies a set of bounding boxes to track.')
-    .describe('country',            'Specifies a country to track (will be translated to bounding box)')
-    .describe('follow',             'A comma separated list of Twitter user IDs')
-    //.describe('track',            'Keywords to track. Phrases of keywords are specified by a comma-separated list')
-    .describe('countries',          'List of recognized countries')
-    .describe('help',               'This help')
-    .describe('consumer-key',       'Your Twitter consumer key')
-    .describe('consumer-secret',    'Your Twitter consumer secret')
-    .describe('access-token-key',   'Your Twitter access token key')
-    .describe('access-token-secret','Your Twitter access token secret')
-    .describe('debug',              'Debug mode')
-    .argv;
+  .describe('locations',          'Specifies a set of bounding boxes to track.')
+  .describe('country',            'Specifies a country to track (will be translated to bounding box)')
+  .describe('follow',             'A comma separated list of Twitter user IDs')
+  //.describe('track',            'Keywords to track. Phrases of keywords are specified by a comma-separated list')
+  .describe('countries',          'List of recognized countries')
+  .describe('help',               'This help')
+  .describe('consumer-key',       'Your Twitter consumer key')
+  .describe('consumer-secret',    'Your Twitter consumer secret')
+  .describe('access-token-key',   'Your Twitter access token key')
+  .describe('access-token-secret','Your Twitter access token secret')
+  .describe('debug',              'Debug mode')
+  .argv;
 
 // parse args
 var streamOptions = {};
@@ -88,4 +86,3 @@ harvester.executeSearch(searchOptions);
 
 // start the harvester
 harvester.startStream(streamOptions);
-
