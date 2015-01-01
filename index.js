@@ -53,7 +53,7 @@ JamendoFromTwitter.prototype.startStream = function(streamOptions) {
 
       self.twit.stream('statuses/filter', streamOptions, function(stream) {
 
-        console.log('I\'ll listen with filters', util.inspect(streamOptions));
+        console.log('Listening with filter', util.inspect(streamOptions));
 
         stream.on('data', function(data) {
             
@@ -79,7 +79,7 @@ JamendoFromTwitter.prototype.startStream = function(streamOptions) {
 
       self.twit.stream('statuses/sample', function(stream) {
 
-        console.log('I\'m listenning to twitter samples, use parameters to customize');
+        console.log('Listening for samples, you have not defined any filters');
 
         stream.on('data', function(data) {
             
@@ -109,32 +109,29 @@ JamendoFromTwitter.prototype.executeSearch = function(searchOptions) {
 
     var self = this;
     
-    self.twit.get('/search/tweets', searchOptions.track, function(error, payload) {
+    self.twit.get('/search/tweets', { q: searchOptions.track} , function(error, payload) {
       
       if (!error) {
 
-        if (typeof payload !== null) {
+        if (payload !== null && payload.statuses.length > 0) {
 
-          console.log('I\'ll also search with filters', util.inspect(searchOptions.track), ': ' + payload.statuses.length + ' results');
+          console.log('Search with filters', util.inspect(searchOptions.track), ': ' + payload.statuses.length + ' results');
 
           // search results do not have expanded_links
           // so we have to expand urls
-          async.forEach(payload.statuses,
+          async.forEach(
+            payload.statuses,
             function(data, callback) {
               // eat this
               data.expand_links = true;
               
               self.write(data, function(error, message) {
 
-                  if (!error) {
-
-                      self.emit('message', message);
-
-                  } else {
-
-                      self.emit('error', error);
-
-                  }
+                if (!error) {
+                  self.emit('message', message);
+                } else {
+                  self.emit('error', error);
+                }
 
               });
                 
@@ -142,7 +139,11 @@ JamendoFromTwitter.prototype.executeSearch = function(searchOptions) {
 
             },
             function(error) {
-              self.emit('error', { message: 'Error: search failed', original_error: error });
+              if (error !== undefined) {
+                self.emit('error', { message: 'Error: extraction failed', original_error: error });
+              } else {
+                self.emit('error', { message: 'Error: extraction failed' });
+              }
             }
           );
 
@@ -202,7 +203,7 @@ JamendoFromTwitter.prototype.write = function(data, callback) {
   JamendoFromTwitter.extractData(data.fulltext, function(extracted) {
     
     if (extracted.nothing) {
-      callback({ message: 'no jamendo data in' }, null);
+      callback({ message: 'No data could get extracted from this tweet' }, null);
     }
 
     data = {
