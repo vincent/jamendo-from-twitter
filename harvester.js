@@ -11,7 +11,7 @@ var conf = { twitter: { } };
 try {
   conf = require('./config');
 } catch (err) {
-  throw('no config.js found, you must copy the copy.js.sample file, rename it to config.js and insert your own twitter API credentials');
+  throw('no config.js found, you must copy the config.js.sample file, rename it to config.js and insert your own twitter API credentials');
 }
 
 // quick & dirty modules
