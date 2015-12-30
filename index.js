@@ -11,9 +11,9 @@ var Twitter = require('twitter');
  * @param {type} conf
  * @returns {JamendoFromTwitter}
  */
-var JamendoFromTwitter = function(conf) {
+var JamendoFromTwitter = function(configuration) {
 
-  if (typeof conf === 'undefined' || !conf.twitter || !conf.twitter.access_token_key) {
+  if (typeof configuration === 'undefined' || !configuration.twitter || !configuration.twitter.access_token_key) {
 
     console.log('Error: missing configuration');
     process.exit(1);
@@ -26,7 +26,7 @@ var JamendoFromTwitter = function(conf) {
     this.processed_count = 0;
 
     // instanciate a twitter client
-    this.twit = new Twitter(conf.twitter);
+    this.twit = new Twitter(configuration.twitter);
 
   }
 
@@ -117,13 +117,15 @@ JamendoFromTwitter.prototype.executeSearch = function(searchOptions) {
 
           console.log('Search with filters', util.inspect(searchOptions.track), ': ' + payload.statuses.length + ' results');
 
-          // search results do not have expanded_links
-          // so we have to expand urls
           async.forEach(
             payload.statuses,
-            function(data, callback) {
-              // eat this
-              data.expand_links = true;
+            function (data, callback) {
+
+              // search results do not have expanded_links
+              // so we have to expand urls
+              // UPDATE: noticed today 30/12/2015 that urls are expanded in search
+              // results too, so no need to expand them anymore
+              data.expand_links = false;
               
               self.write(data, function(error, message) {
 
