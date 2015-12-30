@@ -267,19 +267,18 @@ JamendoFromTwitter.extractData = function(text, callback) {
   var match,
     result = {nothing: true},
     complex = null,
-    reg = new RegExp('(jamen.do|jamendo.com)/(en/|es/|fr/|de/|pl/|it/|)([^ ]+)', 'gi');
+    reg = new RegExp('(jamen.do|jamendo.com)/([^ ]+)', 'gi');
 
   // iterate over suposed jamendo ressources urls 
   while ((match = reg.exec(text)) !== null) {
 
     //match[0] = matched
     //match[1] = domain
-    //match[2] = lang
-    //match[3] = path
-    //match[4] = index
-    //match[5] = input
+    //match[2] = path
+    //match[3] = index
+    //match[4] = input
 
-    complex = match[3].split('/');
+    complex = match[2].split('/');
     
     //console.log(match);
     //console.log(complex);
