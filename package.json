@@ -1,36 +1,78 @@
 {
-  "name": "jamendo-from-twitter",
-  "version": "0.1.2",
-  "description": "Extract Jamendo related data from tweets",
-  "author": "Vincent Lark <vincent.lark@gmail.com>",
-  "license": "BSD",
-  "scripts": {
-    "start": "node harvester.js"
+  "_args": [
+    [
+      "git://github.com/chrisweb/jamendo-from-twitter.git#master",
+      "C:\\Users\\chris\\Documents\\GitHubVisualStudio\\freeMusic.zone"
+    ]
+  ],
+  "_from": "git://github.com/chrisweb/jamendo-from-twitter.git#master",
+  "_id": "jamendo-from-twitter@0.1.3",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/jamendo-from-twitter",
+  "_phantomChildren": {},
+  "_requested": {
+    "hosted": {
+      "directUrl": "https://raw.githubusercontent.com/chrisweb/jamendo-from-twitter/master/package.json",
+      "gitUrl": "git://github.com/chrisweb/jamendo-from-twitter.git#master",
+      "httpsUrl": "git+https://github.com/chrisweb/jamendo-from-twitter.git#master",
+      "shortcut": "github:chrisweb/jamendo-from-twitter#master",
+      "ssh": "git@github.com:chrisweb/jamendo-from-twitter.git#master",
+      "sshUrl": "git+ssh://git@github.com/chrisweb/jamendo-from-twitter.git#master",
+      "type": "github"
+    },
+    "name": null,
+    "raw": "git://github.com/chrisweb/jamendo-from-twitter.git#master",
+    "rawSpec": "git://github.com/chrisweb/jamendo-from-twitter.git#master",
+    "scope": null,
+    "spec": "git://github.com/chrisweb/jamendo-from-twitter.git#master",
+    "type": "hosted"
   },
-  "main": "index.js",
-  "bin" : {
-    "jamendo-from-twitter" : "./harvester.js"
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git://github.com/chrisweb/jamendo-from-twitter.git#ea0a77c785fee9c6375972c1c2e3408575baa791",
+  "_shasum": "a7e000226444b210d453d952a677904afcfec3e3",
+  "_shrinkwrap": null,
+  "_spec": "git://github.com/chrisweb/jamendo-from-twitter.git#master",
+  "_where": "C:\\Users\\chris\\Documents\\GitHubVisualStudio\\freeMusic.zone",
+  "author": {
+    "email": "vincent.lark@gmail.com",
+    "name": "Vincent Lark"
+  },
+  "bin": {
+    "jamendo-from-twitter": "./harvester.js"
   },
   "dependencies": {
-    "twitter": "~1.0.1",
-    "optimist": "~0.6.1",
-    "elongate": "~0.2.1",
-    "async": "~0.9.0"
+    "async": "1.5.0",
+    "elongate": "0.2.1",
+    "optimist": "0.6.1",
+    "twitter": "1.2.5"
   },
+  "description": "Extract Jamendo related data from tweets",
   "devDependencies": {
-    "grunt": ">= 0.4.5",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-shell": "1.1.1",
-    "grunt-contrib-copy": "~0.7.0"
+    "grunt": "0.4.5",
+    "grunt-contrib-copy": "0.8.2",
+    "grunt-contrib-jshint": "0.11.3",
+    "grunt-shell": "1.1.2"
   },
+  "gitHead": "9e4dd74ade20d97ee913077272fdc1c93be2b132",
+  "keywords": [
+    "jamendo",
+    "twitter"
+  ],
+  "license": "BSD",
+  "main": "index.js",
+  "name": "jamendo-from-twitter",
+  "optionalDependencies": {},
+  "readme": "# A tool for extracting Jamendo related data from Twitter\n\n[![Dependencies](https://david-dm.org/vincent/jamendo-from-twitter.png)](https://david-dm.org/vincent/jamendo-from-twitter)\n[![NPM version](https://badge.fury.io/js/jamendo-from-twitter.png)](http://badge.fury.io/js/jamendo-from-twitter)\n\n# Install\n\n### From npm\n```bash\n$ npm install jamendo-from-twitter\n```\n\n### From Github\n```bash\n$ git clone https://github.com/vincent/jamendo-from-twitter.git\n$ cd jamendo-from-twitter\n$ npm install\n```\n\n# Run in command line\n```bash\n$ ./harvester.js --help\n$ jamendo-from-twitter --help  # if installed globally\n```\n\n# Examples\nFrom \n```\nI'm listening to explain - attila jelinek on Jamendo http://jamen.do/t/691953\n```\nYou should get\n```json\n{ \"track_ids\": [ \"691953\" ] }\n```\n\nFrom \n```\nI'm listening to attila on Jamendo http://t.co/tEQoxneNQu\n```\nYou should get\n```json\n{ \"playlist_ids\": [ \"a74097\" ] }\n```\n\n\n# Run in javascript\n```javascript\n// import module\nvar JamendoFromTwitter = require('jamendo-from-twitter')\n\n// get an harvester\nvar harvester = new JamendoFromTwitter({\n\ttwitter: twitter_app_credentials_see_config_sample\n})\n\n// listen to message events\nharvester.on('message', function(message){\n\t// message.extracted contains jamendo data\n\tconsole.log(message.extracted);\n})\n\nharvester.on('error', function(error){\n\t// error object with message property\n\tconsole.log(error.message);\n})\n\n// start harvesting\nharvester.startStream()\n\n// do a search\nharvester.executeSearch()\n\n// or write data directly\nharvester.write({ text: \"I'm listening to attila on Jamendo http://jamen.do/t/691953\" }, function(error, data) {\n\tif (error) {\n\t\tconsole.log(error);\n\t} else {\n\t\tconsole.log(data);\n\t}\n})\n\n// also with short links, just set the expand_links attribute\nharvester.write({ text: \"is a fan of attila jelinek http://t.co/9fNJrR4pNI\", expand_links: true }, function(error, data) {\n\tif (error) {\n\t\tconsole.log(error);\n\t} else {\n\t\tconsole.log(data);\n\t}\n})\n\n\n```\n\n# Run Tests\n```bash\n$ node tests\n```\n\n# Run Grunt (jslint, docs)\n```bash\n$ grunt\n```\n",
+  "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": ""
   },
-  "keywords": [
-    "twitter",
-    "jamendo"
-  ],
-  "gitHead": "9e4dd74ade20d97ee913077272fdc1c93be2b132",
-  "readmeFilename": "README.md"
+  "scripts": {
+    "start": "node harvester.js"
+  },
+  "version": "0.1.3"
 }

@@ -11,9 +11,9 @@ var Twitter = require('twitter');
  * @param {type} conf
  * @returns {JamendoFromTwitter}
  */
-var JamendoFromTwitter = function(conf) {
+var JamendoFromTwitter = function(configuration) {
 
-  if (typeof conf === 'undefined' || !conf.twitter || !conf.twitter.access_token_key) {
+  if (typeof configuration === 'undefined' || !configuration.twitter || !configuration.twitter.access_token_key) {
 
     console.log('Error: missing configuration');
     process.exit(1);
@@ -26,7 +26,7 @@ var JamendoFromTwitter = function(conf) {
     this.processed_count = 0;
 
     // instanciate a twitter client
-    this.twit = new Twitter(conf.twitter);
+    this.twit = new Twitter(configuration.twitter);
 
   }
 
@@ -117,13 +117,15 @@ JamendoFromTwitter.prototype.executeSearch = function(searchOptions) {
 
           console.log('Search with filters', util.inspect(searchOptions.track), ': ' + payload.statuses.length + ' results');
 
-          // search results do not have expanded_links
-          // so we have to expand urls
           async.forEach(
             payload.statuses,
-            function(data, callback) {
-              // eat this
-              data.expand_links = true;
+            function (data, callback) {
+
+              // search results do not have expanded_links
+              // so we have to expand urls
+              // UPDATE: noticed today 30/12/2015 that urls are expanded in search
+              // results too, so no need to expand them anymore
+              data.expand_links = false;
               
               self.write(data, function(error, message) {
 
@@ -265,19 +267,18 @@ JamendoFromTwitter.extractData = function(text, callback) {
   var match,
     result = {nothing: true},
     complex = null,
-    reg = new RegExp('(jamen.do|jamendo.com)/(en/|es/|fr/|de/|pl/|it/|)([^ ]+)', 'gi');
+    reg = new RegExp('(jamen.do|jamendo.com)/([^ ]+)', 'gi');
 
   // iterate over suposed jamendo ressources urls 
   while ((match = reg.exec(text)) !== null) {
 
     //match[0] = matched
     //match[1] = domain
-    //match[2] = lang
-    //match[3] = path
-    //match[4] = index
-    //match[5] = input
+    //match[2] = path
+    //match[3] = index
+    //match[4] = input
 
-    complex = match[3].split('/');
+    complex = match[2].split('/');
     
     //console.log(match);
     //console.log(complex);
